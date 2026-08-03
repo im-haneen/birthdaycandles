@@ -90,9 +90,7 @@
       }
 
       createCandles(candleCount);
-      setTimeout(() => {
-      blowOutCandles();
-      }, 2000);
+   
 
       // === Microphone / Blow Detection ===
       async function startMicDetection() {
@@ -112,21 +110,38 @@
 
           let blown = false;
 
-          function detectBlow() {
-            analyser.getByteFrequencyData(dataArray);
+     function detectBlow() {
+        analyser.getByteFrequencyData(dataArray);
 
-            let highFreqSum = 0;
-            let lowFreqSum = 0;
+       let total = 0;
+       let high = 0;
+       let low = 0;
 
-            const midpoint = dataArray.length / 2;
+       const midpoint = dataArray.length / 2;
 
-            for (let i = 0; i < dataArray.length; i++) {
-              if (i < midpoint) {
-                lowFreqSum += dataArray[i];
-              } else {
-                highFreqSum += dataArray[i];
-              }
-            }
+       for (let i = 0; i < dataArray.length; i++) {
+           total += dataArray[i];
+
+           if (i < midpoint) {
+               low += dataArray[i];
+           } else {
+               high += dataArray[i];
+           }
+       }
+
+      const volume = total / dataArray.length;
+      const lowAvg = low / midpoint;
+      const highAvg = high / midpoint;
+      const ratio = highAvg / (lowAvg + 1);
+
+    // انفخ بقوة أو بصوت مرتفع
+      if (!blown && (volume > 35 || (volume > 20 && ratio > 0.15))) {
+          blown = true;
+          blowOutCandles();
+      }
+
+      requestAnimationFrame(detectBlow);
+      }
 
             const highAvg = highFreqSum / (dataArray.length / 2);
             const lowAvg = lowFreqSum / (dataArray.length / 2);
