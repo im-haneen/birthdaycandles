@@ -90,6 +90,9 @@
       }
 
       createCandles(candleCount);
+      setTimeout(() => {
+      blowOutCandles();
+      }, 2000);
 
       // === Microphone / Blow Detection ===
       async function startMicDetection() {
